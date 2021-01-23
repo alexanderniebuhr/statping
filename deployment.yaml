@@ -1,20 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: guestbook-ui
+  name: statping
+  labels:
+    app: statping
 spec:
-  replicas: 1
-  revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app: guestbook-ui
+      octopusexport: OctopusExport
+  revisionHistoryLimit: 10
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 50%
   template:
     metadata:
       labels:
-        app: guestbook-ui
+        app: statping
+        octopusexport: OctopusExport
     spec:
       containers:
-      - image: gcr.io/heptio-images/ks-guestbook-demo:0.2
-        name: guestbook-ui
-        ports:
-        - containerPort: 80
+        - name: cntnr
+          image: statping/statping
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: dflt
+              containerPort: 8080
+              protocol: TCP
